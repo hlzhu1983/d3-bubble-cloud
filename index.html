@@ -27,25 +27,65 @@
         <li>
           <a href="#" class="title">Jitter</a>
           <div class="content">
-            <input id="jitter" type="range" min="0" max="400" value="100">
+            <input id="jitter" type="range" min="0" max="400" value="200">
           </div>
         </li>
       </ul>      
     </div>
+    <div class="content">
+      <a href="javascript:;" class="close"></a>
+      <div class="inner">
+      <div class="iframe-wrap-paper">
+        <div class="iframe-wrap">
+          <iframe frameborder="0" scrolling="yes"></iframe>
+        </div>
+      </div>
+      </div>
+    </div>
   </div>
   <script src="static/js/libs/jquery-1.11.3.min.js"></script>
   <script src="static/js/libs/d3.min.js"></script>
-  <script src="static/js/bubble.js"></script>
+  <script src="static/js/bubble_bounce.js"></script>
   <script>
   $(document).ready(function(){
-    $('.toolbar').on('click', function(e) {
-      var $target = $(e.target), $this = $(this);
 
-      if($target.closest('.toggle-btn').length) {
-        e.preventDefault();
-        $this.toggleClass('active');
-      }
-    });
+    jQuery.fn.d3Click = function () {
+      this.each(function (i, e) {
+        var evt = document.createEvent("MouseEvents");
+        evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+
+        e.dispatchEvent(evt);
+      });
+    };
+
+    function getScrollBarWidth() {
+      var inner = document.createElement('p');
+      inner.style.width = "100%";
+      inner.style.height = "200px";
+
+      var outer = document.createElement('div');
+      outer.style.position = "absolute";
+      outer.style.top = "0px";
+      outer.style.left = "0px";
+      outer.style.visibility = "hidden";
+      outer.style.width = "200px";
+      outer.style.height = "150px";
+      outer.style.overflow = "hidden";
+      outer.appendChild (inner);
+
+      document.body.appendChild (outer);
+      var w1 = inner.offsetWidth;
+      outer.style.overflow = 'scroll';
+      var w2 = inner.offsetWidth;
+      if (w1 == w2) w2 = outer.clientWidth;
+
+      document.body.removeChild (outer);
+
+      return (w1 - w2);
+    };
+
+    var scrollBarWidth = getScrollBarWidth();
+
     var texts = [
       {
         key: "a",
@@ -62,7 +102,36 @@
       return d3.select(selector).datum(data).call(plot);
     };
 
-    var plot = window.plot = MlD3.bubble(),
+    var $content = $('.wrapper>.content'),
+        $iframe = $content.find('iframe');
+    
+    var winHeight = $(window).height(),
+        iframeWrapHeight = Math.min(winHeight, 780),
+        layerHeight = Math.max(~~(winHeight * 0.8), iframeWrapHeight);
+
+    $content.find('.inner').css({
+      height: layerHeight,
+      'margin-top': (winHeight - layerHeight) / 2
+    })
+
+    $content.find('.iframe-wrap').css({
+      height: iframeWrapHeight,
+    })
+
+    $iframe.css({
+      width: 1000 + scrollBarWidth,
+      height: iframeWrapHeight + 212
+    });
+
+    var plot = window.plot = MlD3.bubble().clickIn(function(d){
+      $content.fadeIn();
+      $iframe.attr('src', 'http://index.haosou.com/#demand?q=' + encodeURIComponent(d.name)).load(function(e){
+
+      });
+    }).clickOut(function(d){
+      $content.fadeOut();
+      $iframe.removeAttr('src');
+    }),
       key = decodeURIComponent(location.search).replace('?', ''),
       text = texts.filter(function(t) {
         return t.key === key;
@@ -82,9 +151,28 @@
       location.replace("#");
       return location.search = encodeURIComponent(key);
     });
-    return d3.csv('data/' + text.file, function(data) {
+    d3.csv('data/' + text.file, function(data) {
       plotData('#plot', data, plot);
     });
+
+    $('.toolbar').on('click', function(e) {
+      var $target = $(e.target), $this = $(this);
+
+      if($target.closest('.toggle-btn').length) {
+        e.preventDefault();
+        $this.toggleClass('active');
+      }
+    });
+
+    $content.on('click', function(e) {
+      var $target = $(e.target), $this = $(this);
+      if($target.is('.close')) {
+        e.preventDefault();
+        console.log('asdfasd');
+        // activeLayerD
+        $('.bubble-active').d3Click();
+      }
+    })
   });
   </script>
 </body>

@@ -84,7 +84,6 @@ ul {
 #plot {
   height: 100%;
   overflow: hidden;
-  background: #a3f5cf;
 }
 
 
@@ -92,6 +91,80 @@ ul {
   float:right;
   margin-right: 10px;
 }
+
+.wrapper .content {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  display: none;
+}
+
+.wrapper .content .close {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  right: 0;
+  top: 0;
+}
+
+.wrapper .content .inner {
+  position: relative;
+  width: 790px;
+  margin: auto;
+  height: 100%;
+}
+
+.wrapper .content .inner:before, .wrapper .content .inner:after{
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  padding: 20px;
+  height: 100%;
+  box-shadow: 0 0 3px rgba(0,0,0,0.3);
+  background-color: #fff;
+}
+.wrapper .content .inner:before{
+  transform: rotate(2deg);
+}
+.wrapper .content .inner::after{
+  transform: rotate(-2deg);
+}
+
+.wrapper .content .iframe-wrap-paper {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.wrapper .content .iframe-wrap {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.wrapper .content iframe {
+  width: 1000px;
+  height: 100%;
+  display: block;
+  position: relative;
+  left: -210px;
+  top: -152px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+
 
 svg .bubble-area-bg {
   pointer-events: all;
